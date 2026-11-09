@@ -14,6 +14,7 @@
 6. [Taste — The Aesthetic Standard](#6-taste--the-aesthetic-standard)
 7. [The Impeccable Rule](#7-the-impeccable-rule)
 8. [Effective AI Prompting Patterns](#8-effective-ai-prompting-patterns)
+9. [API & System Design Patterns](#9-api--system-design-patterns)
 
 ---
 
@@ -502,6 +503,51 @@ Before you give me the final answer:
 2. Is anything missing that I need to know?
 3. Are there any claims you're not confident about?
 If yes to #3, flag them explicitly.
+```
+
+---
+
+## 9. API & System Design Patterns
+
+Every design or implementation should consider these patterns — and apply one only when it is applicable and really necessary. A pattern added "just in case" is complexity without a payoff.
+
+### 9.1 Patterns to Evaluate
+
+| Pattern | Use when | Limitation / cost |
+|---|---|---|
+| **Resource-Oriented Design** | Exposing domain entities over an API (nouns + standard methods, consistent URLs) | Awkward for action-heavy workflows; don't force RPC-style operations into fake resources |
+| **Pagination** | Any list that can grow unbounded | Offset pagination degrades on large tables and drifts under concurrent writes; cursor pagination can't jump to page N |
+| **Filtering & Field Selection** | Clients need subsets of rows or fields; payload size matters | Each filter is a query path to index, validate and secure; arbitrary filters invite slow queries and injection |
+| **Idempotency** | Retried writes: payments, orders, webhooks, anything behind a flaky network | Needs an idempotency-key store with TTL and a defined response for replays |
+| **Backend for Frontend (BFF)** | Clients (web, mobile, partner) need very different shapes or auth flows | One more service per client to build, deploy and keep in sync; logic can get duplicated across BFFs |
+| **API Gateway** | Many services need one entry point for auth, rate limiting, routing, logging | Extra hop and single point of failure; overkill for a single backend |
+| **Asynchronous API** | Work is slow (> a few seconds), bursty, or must survive restarts (202 + job id, queue, webhook/polling) | Harder to debug and test; needs job status, retries, dead-letter handling and eventual-consistency UX |
+| **Versioning** | Public or third-party clients you can't update in lockstep | Every live version is code to maintain; prefer additive, backward-compatible changes first |
+
+### 9.2 Evaluation Checklist
+
+Before choosing (or rejecting) a pattern, state:
+- [ ] **Good points** — the concrete problem it solves here, not in general
+- [ ] **Limitations** — complexity, cost, and what it makes harder
+- [ ] **Scale metrics** — total users, concurrent active users, request rate, data volume, growth expectation (name the numbers or the assumption)
+- [ ] **Security** — authN/authZ placement, data isolation, input validation, rate limiting, replay/abuse risk
+- [ ] **Performance** — latency, throughput, query/index cost, payload size, caching
+- [ ] **Operability** — monitoring, failure modes, rollback, team ability to maintain it
+
+If the current scale doesn't justify a pattern, skip it and note the threshold at which it would become necessary.
+
+### 9.3 Design Pattern Review Prompt
+
+```
+Review this design against these patterns: Resource-Oriented Design, Pagination,
+Filtering & Field Selection, Idempotency, BFF, API Gateway, Asynchronous API, Versioning.
+For each one that applies:
+1. Why it is needed here (the concrete problem)
+2. Its limitations and cost
+3. The scale it assumes: total users, concurrent active users, request rate
+4. Security and performance impact
+For each one you reject, say why in one line.
+Do not recommend a pattern the current scale doesn't justify.
 ```
 
 ---

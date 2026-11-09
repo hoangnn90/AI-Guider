@@ -108,4 +108,33 @@ Impeccable communication:
 
 ---
 
+## 7. API & System Design Patterns
+
+**Every design or implementation must consider these patterns — apply one only when it is applicable and really necessary.**
+
+Patterns to evaluate:
+
+| Pattern | Use when | Limitation / cost |
+|---|---|---|
+| **Resource-Oriented Design** | Exposing domain entities over an API (nouns + standard methods, consistent URLs) | Awkward for action-heavy workflows; don't force RPC-style operations into fake resources |
+| **Pagination** | Any list that can grow unbounded | Offset pagination degrades on large tables and drifts under concurrent writes; cursor pagination can't jump to page N |
+| **Filtering & Field Selection** | Clients need subsets of rows or fields; payload size matters | Each filter is a query path to index, validate and secure; arbitrary filters invite slow queries and injection |
+| **Idempotency** | Retried writes: payments, orders, webhooks, anything behind a flaky network | Needs an idempotency-key store with TTL and a defined response for replays |
+| **Backend for Frontend (BFF)** | Clients (web, mobile, partner) need very different shapes or auth flows | One more service per client to build, deploy and keep in sync; logic can get duplicated across BFFs |
+| **API Gateway** | Many services need one entry point for auth, rate limiting, routing, logging | Extra hop and single point of failure; overkill for a single backend |
+| **Asynchronous API** | Work is slow (> a few seconds), bursty, or must survive restarts (202 + job id, queue, webhook/polling) | Harder to debug and test; needs job status, retries, dead-letter handling and eventual-consistency UX |
+| **Versioning** | Public or third-party clients you can't update in lockstep | Every live version is code to maintain; prefer additive, backward-compatible changes first |
+
+Before choosing (or rejecting) a pattern, evaluate and state:
+- **Good points** — the concrete problem it solves here, not in general.
+- **Limitations** — complexity, cost, and what it makes harder.
+- **Scale metrics** — total users, concurrent active users, request rate, data volume, growth expectation. Name the numbers (or the assumption) that justify the choice.
+- **Security** — authN/authZ placement, data isolation, input validation, rate limiting, replay/abuse risk.
+- **Performance** — latency, throughput, query/index cost, payload size, caching.
+- **Operability** — monitoring, failure modes, rollback, team ability to maintain it.
+
+If the current scale doesn't justify a pattern, say so and don't add it (see §2 Simplicity First) — note the threshold at which it would become necessary.
+
+---
+
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, clarifying questions come before implementation rather than after mistakes, and every output feels trustworthy.
