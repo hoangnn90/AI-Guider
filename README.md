@@ -9,7 +9,7 @@
 This README is the human guide. [`AGENTS.md`](AGENTS.md) is the condensed version written for AI coding agents — it works with any agent, not only one vendor's:
 
 - **Part A — General:** rules for every task (think first, simplicity, surgical changes, goal-driven, taste, impeccable).
-- **Part B — By category:** UI/UX, Frontend, Backend & API, System & Architecture, Performance, Security, Testing & Quality. An agent reads only the categories its task touches.
+- **Part B — By category:** UI/UX, Frontend, Backend & API, System & Architecture, Performance, Security, Testing & Quality, Diagrams. An agent reads only the categories its task touches.
 
 **Setup:** copy `AGENTS.md` into your project root. Many agents (e.g. Codex, Cursor, GitHub Copilot's coding agent) read `AGENTS.md` directly. For agents that look for their own filename, symlink it so there is one source of truth:
 
@@ -33,6 +33,7 @@ This repo ships both symlinks already. Edit `AGENTS.md` only.
 7. [The Impeccable Rule](#7-the-impeccable-rule)
 8. [Effective AI Prompting Patterns](#8-effective-ai-prompting-patterns)
 9. [API & System Design Patterns](#9-api--system-design-patterns)
+10. [Diagrams](#10-diagrams)
 
 ---
 
@@ -600,6 +601,30 @@ For each one that applies:
 For each one you reject, say why in one line.
 Do not recommend a pattern the current scale doesn't justify.
 ```
+
+---
+
+## 10. Diagrams
+
+Use **[archify](https://github.com/tt-a1i/archify)** to draw class diagrams. It produces validated, standalone HTML diagrams (with light/dark themes and image/SVG export) and can inspect the repository so the diagram matches the real code.
+
+**Install** (works with any agent that supports skills):
+```bash
+npx skills add tt-a1i/archify
+```
+
+**When:** any design that adds or changes classes, entities or modules and their relationships.
+
+**Prompt:**
+```
+Use archify to draw a class diagram for [module / feature].
+Inspect the actual code in [paths] — don't draw from memory.
+Show classes, key fields and methods, and relationships (inheritance,
+composition, association) with multiplicity.
+Save the HTML next to [design doc] and link it from there.
+```
+
+The written design doc stays the source of truth; the diagram supplements it.
 
 ---
 

@@ -223,6 +223,12 @@ If the current scale doesn't justify a pattern, say so and don't add it (§2 Sim
 
 **Code review checklist:** correctness, readability, testability, error handling at the right level, no hidden side effects, intent-revealing names, no dead code, manageable complexity.
 
+## 14. Diagrams
+
+- Draw class diagrams with **archify** ([`tt-a1i/archify`](https://github.com/tt-a1i/archify), install: `npx skills add tt-a1i/archify`) whenever a design adds or changes classes, entities or modules and their relationships.
+- Build it from the real code (let archify inspect the repo), not from memory.
+- Save archify's standalone HTML next to the design doc it explains and link it from there. The written doc stays the source of truth; the diagram supplements it.
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, clarifying questions come before implementation rather than after mistakes, and every output feels trustworthy.
