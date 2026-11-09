@@ -194,6 +194,27 @@ Ask AI to check for these specifically:
 5. Ask AI to list what changed and why
 ```
 
+### 2.5 Skeleton Loading
+
+Apply skeleton loading to UI components that load data: show placeholder shapes that match the final layout instead of a blank area or a full-page spinner. It makes the wait feel shorter and shows the user what is coming.
+
+| Rule | Why |
+|---|---|
+| Match the real size and position of the content | Nothing jumps when data arrives (no layout shift / CLS) |
+| Load per component, not per page | Show what's ready; skeleton only what's still loading |
+| Spinners only for short actions (e.g. a submitting button) | Skeletons are for content, spinners for actions |
+| Skip the skeleton if data arrives almost instantly | Avoids a distracting flash |
+| `aria-busy="true"` on loading regions | Screen readers know the content is loading |
+| Subtle shimmer, respect `prefers-reduced-motion` | Motion shouldn't distract or harm |
+
+**Prompt:**
+```
+Add skeleton loading to [component/page]. For each component that loads data,
+render a skeleton that matches the final layout's size and position.
+Load per component, keep spinners only for button actions, add aria-busy,
+and respect prefers-reduced-motion. Confirm there is no layout shift when data arrives.
+```
+
 ---
 
 ## 3. Performance Guidance

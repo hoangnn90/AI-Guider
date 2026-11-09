@@ -122,6 +122,11 @@ Impeccable applies to UI too — see §7 Design quality (Impeccable skill).
 ## 7. UI/UX
 
 - **Design every state**, not just the happy path: empty, loading, error (with a recovery action), zero results, permission denied, success (with a next step).
+- **Skeleton loading:** UI components that load data show a skeleton — placeholder shapes matching the final layout — not a blank area or a full-page spinner.
+  - Match the real size and position so nothing jumps when content arrives (no layout shift).
+  - Load per component: render what's ready, skeleton only what's still loading.
+  - Keep spinners for short actions (e.g. a submitting button); skip the skeleton if data arrives almost instantly to avoid a flash.
+  - Mark loading regions with `aria-busy="true"`; keep shimmer subtle and respect `prefers-reduced-motion`.
 - **Clarity & hierarchy:** the primary action and the most important information are the most prominent. One primary action per screen.
 - **Consistency:** reuse existing components, spacing, typography and color tokens. No one-off styling.
 - **Feedback:** every user action gets a visible response; destructive actions need confirmation, low-risk ones don't.
