@@ -4,6 +4,24 @@
 
 ---
 
+## Use It With Any AI Agent
+
+This README is the human guide. [`AGENTS.md`](AGENTS.md) is the condensed version written for AI coding agents — it works with any agent, not only one vendor's:
+
+- **Part A — General:** rules for every task (think first, simplicity, surgical changes, goal-driven, taste, impeccable).
+- **Part B — By category:** UI/UX, Frontend, Backend & API, System & Architecture, Performance, Security, Testing & Quality. An agent reads only the categories its task touches.
+
+**Setup:** copy `AGENTS.md` into your project root. Many agents (e.g. Codex, Cursor, GitHub Copilot's coding agent) read `AGENTS.md` directly. For agents that look for their own filename, symlink it so there is one source of truth:
+
+```bash
+ln -s AGENTS.md CLAUDE.md   # Claude Code
+ln -s AGENTS.md GEMINI.md   # Gemini CLI
+```
+
+This repo ships both symlinks already. Edit `AGENTS.md` only.
+
+---
+
 ## Table of Contents
 
 1. [AI Coding Guidelines (Karpathy Principles)](#1-ai-coding-guidelines-karpathy-principles)
@@ -513,16 +531,23 @@ Every design or implementation should consider these patterns — and apply one 
 
 ### 9.1 Patterns to Evaluate
 
+**Backend & API patterns:**
+
 | Pattern | Use when | Limitation / cost |
 |---|---|---|
 | **Resource-Oriented Design** | Exposing domain entities over an API (nouns + standard methods, consistent URLs) | Awkward for action-heavy workflows; don't force RPC-style operations into fake resources |
 | **Pagination** | Any list that can grow unbounded | Offset pagination degrades on large tables and drifts under concurrent writes; cursor pagination can't jump to page N |
 | **Filtering & Field Selection** | Clients need subsets of rows or fields; payload size matters | Each filter is a query path to index, validate and secure; arbitrary filters invite slow queries and injection |
 | **Idempotency** | Retried writes: payments, orders, webhooks, anything behind a flaky network | Needs an idempotency-key store with TTL and a defined response for replays |
-| **Backend for Frontend (BFF)** | Clients (web, mobile, partner) need very different shapes or auth flows | One more service per client to build, deploy and keep in sync; logic can get duplicated across BFFs |
-| **API Gateway** | Many services need one entry point for auth, rate limiting, routing, logging | Extra hop and single point of failure; overkill for a single backend |
 | **Asynchronous API** | Work is slow (> a few seconds), bursty, or must survive restarts (202 + job id, queue, webhook/polling) | Harder to debug and test; needs job status, retries, dead-letter handling and eventual-consistency UX |
 | **Versioning** | Public or third-party clients you can't update in lockstep | Every live version is code to maintain; prefer additive, backward-compatible changes first |
+
+**System & architecture patterns:**
+
+| Pattern | Use when | Limitation / cost |
+|---|---|---|
+| **Backend for Frontend (BFF)** | Clients (web, mobile, partner) need very different shapes or auth flows | One more service per client to build, deploy and keep in sync; logic can get duplicated across BFFs |
+| **API Gateway** | Many services need one entry point for auth, rate limiting, routing, logging | Extra hop and single point of failure; overkill for a single backend |
 
 ### 9.2 Evaluation Checklist
 
