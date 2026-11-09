@@ -215,6 +215,28 @@ Load per component, keep spinners only for button actions, add aria-busy,
 and respect prefers-reduced-motion. Confirm there is no layout shift when data arrives.
 ```
 
+### 2.6 Result Popups: Always Offer the Next Step
+
+Every popup/window that shows a success or failure result must include:
+1. **Status indicator** — icon + color + title, so the outcome is clear at a glance (don't rely on color alone).
+2. **Message** — what happened, in plain words.
+3. **Next action** — a way to view, preview or act on the result.
+
+| Result | Show | Example: user creates a new order |
+|---|---|---|
+| **Success** | Summary preview + button to the detail + optional follow-up action | ✓ "Order #1024 created" · 3 items · total → **View order**, **Create another** |
+| **Failure** | Cause in plain words, user's input kept, recovery action | ✕ "Couldn't create the order: item X is out of stock" → **Try again**, **Edit order** |
+
+**Anti-pattern:** a popup that only says "Success" or "Error" with a single **OK** — the user has to go hunting for the result.
+
+**Prompt:**
+```
+Review every success/failure popup in [feature]. Each must have a status indicator
+(icon + color + title), a plain message, and a next action: on success a preview of
+the result with a button to its detail; on failure the cause, kept input and a retry.
+List popups that are dead ends and propose the fix.
+```
+
 ---
 
 ## 3. Performance Guidance

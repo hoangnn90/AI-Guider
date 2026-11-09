@@ -127,6 +127,10 @@ Impeccable applies to UI too — see §7 Design quality (Impeccable skill).
   - Load per component: render what's ready, skeleton only what's still loading.
   - Keep spinners for short actions (e.g. a submitting button); skip the skeleton if data arrives almost instantly to avoid a flash.
   - Mark loading regions with `aria-busy="true"`; keep shimmer subtle and respect `prefers-reduced-motion`.
+- **Result popups/windows:** every success or failure result shows a clear status indicator (icon + color + title), a message, and the next action.
+  - Success: a way to view the result — a summary preview plus a button to its detail. Example: after creating an order, show the order number and total with **View order** and **Create another**.
+  - Failure: what went wrong in plain words, with the user's input kept, plus **Try again** and a way to fix or go back.
+  - Never a dead end: no popup that only says "Success" / "Error" with a lone **OK**.
 - **Clarity & hierarchy:** the primary action and the most important information are the most prominent. One primary action per screen.
 - **Consistency:** reuse existing components, spacing, typography and color tokens. No one-off styling.
 - **Feedback:** every user action gets a visible response; destructive actions need confirmation, low-risk ones don't.
