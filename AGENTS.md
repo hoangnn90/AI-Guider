@@ -127,6 +127,17 @@ Impeccable applies to UI too — see §7 Design quality (Impeccable skill).
   - Load per component: render what's ready, skeleton only what's still loading.
   - Keep spinners for short actions (e.g. a submitting button); skip the skeleton if data arrives almost instantly to avoid a flash.
   - Mark loading regions with `aria-busy="true"`; keep shimmer subtle and respect `prefers-reduced-motion`.
+- **Perceived speed — make it feel instant.** Most felt speed is design, not servers:
+  1. **Optimistic UI** — for low-risk, likely-to-succeed actions (like, toggle, reorder, mark read) update the UI at 0 ms and roll back on error. Never optimistic for money, stock, order status or anything another user acts on.
+  2. **Skeleton first** — the layout before the content (see above).
+  3. **Blurry preview** — images reserve their box and show a tiny (~1 KB) blurred placeholder, never an empty box that pops in.
+  4. **Honest progress bar** — for multi-second determinate work show real progress; ease it (slow start, fast finish) but never fake completion.
+  5. **Early upload** — start uploading a picked file immediately while the user fills in the rest; submit only links the uploaded id.
+  6. **Show the work** — long searches/jobs show what is happening ("120 / 412 scanned…") instead of a bare spinner.
+- **Icons move, not swap.** When an icon reflects a state change, animate between the states instead of replacing one picture with another:
+  - Examples: play/pause (triangle splits into two bars, ~300 ms), download (arrow drops, ring fills, tick draws, ~1.2 s), theme switch (sun rays retract, a shadow carves the moon), search (handle swings into an X, ~400 ms), send (flies out on an arc, a new one springs in), unlock (shackle springs up with a slight overshoot).
+  - Keep state toggles at 200–400 ms (longer only for progress); animate `transform`, `opacity` or SVG paths only; the end frame equals the static icon.
+  - Respect `prefers-reduced-motion` (instant swap). Review timing at full and ¼ speed before shipping.
 - **Result popups/windows:** every success or failure result shows a clear status indicator (icon + color + title), a message, and the next action.
   - Success: a way to view the result — a summary preview plus a button to its detail. Example: after creating an order, show the order number and total with **View order** and **Create another**.
   - Failure: what went wrong in plain words, with the user's input kept, plus **Try again** and a way to fix or go back.
@@ -163,6 +174,16 @@ Impeccable applies to UI too — see §7 Design quality (Impeccable skill).
 - Keep transactions short; never hold locks across network calls.
 - Migrations are backward-compatible and reversible where possible.
 
+**REST conventions** (always):
+- **Meaningful status codes:** the HTTP status matches reality — 400/422 validation, 401 no/expired session, 403 not allowed, 404 missing *or not yours*, 409 conflict, 429 too fast, 5xx only for real server faults. Never 200 with an error buried in the body; never let an expected case surface as a 500.
+- **Error envelope:** one structured error shape everywhere (code, message, field errors) so clients can actually handle it and show field errors inline.
+- **Pagination:** every list endpoint pages, with a server-side maximum page size — nobody wants the whole table in one response.
+- **Filtering & sorting:** let the client ask for a slice; filterable/sortable fields come from a whitelist, never interpolated from input.
+- **Consistent naming:** one convention used everywhere (e.g. plural nouns `/users`, one JSON casing) beats a clever one used once.
+- **Auth in headers:** tokens only in the `Authorization` header, never in a URL — URLs end up in logs, browser history and screenshots.
+- **Idempotency keys** on retriable writes that create money or orders: a network retry must be processed once.
+- **Rate limiting:** answer 429 when one client is too fast, so it can't take the API down.
+
 **API design patterns** — consider each; apply only when applicable and really necessary (evaluate with §10.2):
 
 | Pattern | Use when | Limitation / cost |
@@ -173,6 +194,7 @@ Impeccable applies to UI too — see §7 Design quality (Impeccable skill).
 | **Idempotency** | Retried writes: payments, orders, webhooks, anything behind a flaky network | Needs an idempotency-key store with TTL and a defined response for replays |
 | **Asynchronous API** | Work is slow (> a few seconds), bursty, or must survive restarts (202 + job id, queue, webhook/polling) | Harder to debug and test; needs job status, retries, dead-letter handling and eventual-consistency UX |
 | **Versioning** | Public or third-party clients you can't update in lockstep | Every live version is code to maintain; prefer additive, backward-compatible changes first |
+| **HATEOAS** | Generic or third-party clients must discover the next actions from the response (links) | Little value when your own frontend is coupled to the API anyway; adds payload and design effort |
 
 ## 10. System & Architecture
 
@@ -222,6 +244,22 @@ If the current scale doesn't justify a pattern, say so and don't add it (§2 Sim
 - **Dependencies:** no known-vulnerable packages; no untrusted downloads.
 - **SSRF:** user input must not trigger requests to internal services.
 - Check against the OWASP Top 10 for any new endpoint or module.
+
+**12 API security rules** — check every new or changed endpoint (most breaches walk through a rule someone forgot):
+1. **Authenticate every call** — no anonymous back doors; a public route is a deliberate, documented exception.
+2. **Check object access** — the caller's ID/tenant, not any ID from the URL or body.
+3. **Rate limit** — slow down brute force on login, OTP, public and expensive routes.
+4. **Validate input** — reject what you didn't expect (unknown fields, oversized values, unbounded page sizes).
+5. **HTTPS only** — no plain-text tokens; HSTS and security headers.
+6. **Short-lived tokens** — leaks expire fast; long sessions use refresh + revocation, not a long-lived access token.
+7. **Least privilege keys** — roles, API keys and integration tokens get the narrowest scope; read-only when possible.
+8. **No secrets in URLs** — URLs end up in logs.
+9. **Log auth failures** — failed logins, invalid tokens and denials are logged with user/IP (never the secret) to spot attacks early. Don't reveal whether an account exists.
+10. **Version and retire** — remove old, weak and test endpoints instead of leaving them reachable.
+11. **Limit response data** — send only what the client needs; never serialize secrets or hashes.
+12. **Inventory endpoints** — you can't guard what you forgot: keep an automated check that every route is either guarded or explicitly listed as public, and fail the build on anything else.
+
+**Legacy plain-text passwords:** don't rely on "re-hash on next login" — users who never return keep a readable password in every DB dump. Backfill-hash all of them in one migration, then remove the plain-text comparison from the login path.
 
 **End-user data protection:** end-user account data and personal content are encrypted so they can be decrypted only with a key the end user holds or explicitly shares.
 - Encrypt on the client (end-to-end) with a key derived from or held by the user (passphrase → Argon2id, or a device key). The server stores only ciphertext and never sees the key.
