@@ -90,6 +90,8 @@ Signs of tasteless code:
 
 **The delete test:** Can any line be removed without breaking behavior? If yes, remove it.
 
+Taste applies to UI too — see §7 Design quality (Taste skill).
+
 ## 6. The Impeccable Rule
 
 **Be impeccable with your word. Every output must be accurate, complete, and traceable.**
@@ -111,6 +113,8 @@ Impeccable communication:
 - Be specific: "Line 42 has a race condition" not "there might be threading issues."
 - State confidence: high / medium / low. For low confidence, name what's needed to verify.
 
+Impeccable applies to UI too — see §7 Design quality (Impeccable skill).
+
 ---
 
 # Part B — By category
@@ -124,6 +128,12 @@ Impeccable communication:
 - **Forms:** validation errors appear inline at the field, not only on submit.
 - **Accessibility (WCAG 2.1 AA):** contrast ≥ 4.5:1 (3:1 for large text), visible focus, keyboard navigable, labels/alt text/ARIA, touch targets ≥ 44×44px.
 - **Copy:** labels in the user's language, not developer jargon.
+
+**Design quality — Impeccable + Taste.** Use both skills together on every visual surface:
+- **Taste** ([`Leonxlnx/taste-skill`](https://github.com/Leonxlnx/taste-skill)) sets the direction and blocks generic AI defaults (everything centered, default fonts, pale-blue buttons, uniform spacing, bland hovers) by calibrating variance, motion and density. Install: `npx skills add https://github.com/Leonxlnx/taste-skill --skill design-taste-frontend`
+- **Impeccable** ([`pbakaus/impeccable`](https://github.com/pbakaus/impeccable)) applies a consistent design language — typography, color, spacing, hierarchy — and runs `/impeccable` commands to audit, polish and distill. Install: `npx skills add https://github.com/pbakaus/impeccable --skill impeccable`
+- Workflow: Taste to choose the direction → build → Impeccable to audit and polish → check the states and accessibility above.
+- The project's own design system wins where a skill conflicts with it.
 
 ## 8. Frontend
 

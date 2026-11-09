@@ -402,6 +402,14 @@ Review this design for visual noise and unnecessary complexity:
 - Check that color is used purposefully, not decoratively
 ```
 
+**Taste skill:** for UI work, install [Taste](https://github.com/Leonxlnx/taste-skill) — anti-slop design rules that stop the agent from producing generic AI-looking interfaces (everything centered, default fonts, pale-blue buttons, uniform spacing, bland hovers). It calibrates three dials — variance, motion, density — on every frontend task.
+
+```bash
+npx skills add https://github.com/Leonxlnx/taste-skill --skill design-taste-frontend
+```
+
+Use it together with the Impeccable skill (§7.5).
+
 ### 6.4 The "Delete Test"
 
 A tasteful solution survives the delete test:
@@ -475,6 +483,32 @@ Ask AI to write a commit message that:
 - References the ticket/issue if applicable
 - Is complete: someone reading it in 2 years can understand the intent
 - Does not say "misc fixes", "updates", or "WIP"
+```
+
+### 7.5 Impeccable UI Design
+
+Impeccable applies to the interface too. The [Impeccable skill](https://github.com/pbakaus/impeccable) gives the agent a consistent design language — typography, color, spacing, hierarchy — plus `/impeccable` commands to audit, polish and distill a UI.
+
+```bash
+npx skills add https://github.com/pbakaus/impeccable --skill impeccable
+```
+
+**Combine Impeccable + Taste** (§6.3) on every visual surface:
+
+| Step | Skill | Purpose |
+|---|---|---|
+| 1. Direction | Taste | Pick a deliberate look; avoid generic AI defaults |
+| 2. Build | — | Implement with the project's components and tokens |
+| 3. Audit & polish | Impeccable | Fix typography, color, spacing, hierarchy |
+| 4. Verify | — | All UI states and accessibility (§2) |
+
+**Prompt:**
+```
+Design [screen] for [user] whose goal is [goal].
+Use the Taste skill to choose a deliberate direction and avoid generic defaults,
+then run Impeccable to audit and polish typography, color, spacing and hierarchy.
+Follow our design system where it conflicts with either skill.
+List what you changed in the polish pass and why.
 ```
 
 ---
