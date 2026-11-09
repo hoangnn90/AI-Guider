@@ -204,6 +204,14 @@ If the current scale doesn't justify a pattern, say so and don't add it (§2 Sim
 - **SSRF:** user input must not trigger requests to internal services.
 - Check against the OWASP Top 10 for any new endpoint or module.
 
+**End-user data protection:** end-user account data and personal content are encrypted so they can be decrypted only with a key the end user holds or explicitly shares.
+- Encrypt on the client (end-to-end) with a key derived from or held by the user (passphrase → Argon2id, or a device key). The server stores only ciphertext and never sees the key.
+- Admins, support, other users and services can decrypt only after the end user shares access (e.g. the data key wrapped with the recipient's public key). Revoke by rotating the data key.
+- Encrypt, don't encode: Base64/hex is not protection. Use vetted libraries (libsodium, Web Crypto) and authenticated encryption (AES-GCM, XChaCha20-Poly1305). Never invent crypto.
+- Passwords are hashed (Argon2id / bcrypt), never encrypted or stored recoverable.
+- Never log keys, plaintext or decrypted payloads.
+- State the tradeoffs before applying (§10.2): a lost key means lost data unless the user kept a recovery key; server-side search, sorting, analytics, AI processing and support access to that data are lost or move to the client. Decide per field what must be end-user-encrypted and what must stay server-readable (e.g. IDs, fields used for authorization), and document it.
+
 ## 13. Testing & Quality
 
 - Tests assert behavior, not implementation details.

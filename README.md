@@ -286,6 +286,32 @@ Scan this codebase/file for hardcoded secrets, exposed credentials,
 or insecure configuration. List every occurrence with file:line and severity.
 ```
 
+### 4.4 End-User Data Encryption
+
+End-user account data and personal content must be encrypted so they can be decrypted **only with a key the end user holds or explicitly shares**. Not the server, not admins, not support.
+
+Ask AI to verify:
+- Data is encrypted on the client (end-to-end) with a key derived from or held by the user (passphrase → Argon2id, or a device key); the server stores only ciphertext
+- Sharing works by giving access to the key (e.g. data key wrapped with the recipient's public key), and access can be revoked by rotating the data key
+- It is real encryption, not encoding: Base64/hex is not protection
+- Vetted libraries (libsodium, Web Crypto) and authenticated encryption (AES-GCM, XChaCha20-Poly1305); no homemade crypto
+- Passwords are hashed (Argon2id / bcrypt), never encrypted or recoverable
+- Keys, plaintext and decrypted payloads never appear in logs
+
+**Tradeoffs to state before applying:**
+- A lost key means lost data unless the user kept a recovery key
+- Server-side search, sorting, analytics, AI processing and support access to that data are lost or must move to the client
+- Some fields must stay server-readable (e.g. IDs, fields used for authorization) — decide per field and document it
+
+**Prompt:**
+```
+Review how this feature stores end-user data. For each field, say whether it is
+end-to-end encrypted with a key only the user holds or shares, and if not, why.
+Check: client-side encryption, key derivation, sharing and revocation, algorithm
+choice, password hashing, and that no key or plaintext is logged.
+List the features this breaks (search, analytics, support, recovery) and how each is handled.
+```
+
 ---
 
 ## 5. Software Quality
